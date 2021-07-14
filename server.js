@@ -81,20 +81,15 @@ books:[{
   console.log(mamoun);
   mamoun.save();
 }
-// seedbookscollection()
+// seedbookscollection();
 
 
 
-server.get('/',(req,res)=>{res.status(200).send('home')})
 
-server.get('/test',(req,res)=>{
-    res.status(200).send('allgood');
-    
-})
 // http://localhost:3001/books?usermail=mamoun.alshishani@yahoo.com
 server.get('/books',getUserData);
-
-
+server.post('/addbooks',addBooksHandler);
+server.delete('/removebooks/:userBooks',removeBooksHandler);
 
 function getUserData(req, res){
 let {usermail} = req.query;
@@ -110,11 +105,57 @@ console.log(userData[0].books);
 }
 
 
-  
 
 
 
+function addBooksHandler(req, res){
+console.log(req.body);
 
+let {email ,name ,description ,Img ,stats} =req.body;
+
+newUserModel.find({email:email},(error,userData)=>{
+
+  if(error){
+    res.send('cant find any informartion to post')
+  }else{
+  userData[0].books.push({
+name: name,
+Img: Img,
+description: description,
+stats: stats,
+
+  })
+  userData[0].save();
+  res.send(userData[0].books)
+  }
+
+});
+}
+
+
+function removeBooksHandler(req, res){
+
+  let {usermail} = req.query;
+let  index=parseInt(req.params.userBooks);
+
+newUserModel.find({email:usermail},(error,userData)=>{
+
+  if(error){
+    res.send('could not delete ')
+  }else{
+let deletedData=userData[0].books.filter((TheBooks, indx)=>{
+
+if  (indx !== index){return TheBooks}
+
+})
+userData[0].books =deletedData;
+userData[0].save();
+res.send(userData[0].books);
+
+}
+
+})
+}
 // app.get('/test', (request, response) => {
 
   // TODO: 
@@ -124,5 +165,10 @@ console.log(userData[0].books);
   // STEP 3: to prove that everything is working correctly, send the opened jwt back to the front-end
 
 // })
+server.get('/',(req,res)=>{res.status(200).send('home')})
 
+server.get('/test',(req,res)=>{
+    res.status(200).send('allgood');
+    
+})
 server.listen(PORT, () => console.log(`listening on ${PORT}`));
