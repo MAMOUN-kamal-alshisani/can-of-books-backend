@@ -14,7 +14,7 @@ server.use(express.json());
 
 const PORT = process.env.PORT;
 
-mongoose.connect('mongodb://localhost:27017/books', {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect('mongodb://mamoun:00000000@cluster0-shard-00-00.glcx2.mongodb.net:27017,cluster0-shard-00-01.glcx2.mongodb.net:27017,cluster0-shard-00-02.glcx2.mongodb.net:27017/booksproject?ssl=true&replicaSet=atlas-26qjx9-shard-0&authSource=admin&retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true});
 // const jwt = require('jsonwebtoken');
 // const jwksClient = require('jwks-rsa');
 
@@ -81,7 +81,7 @@ books:[{
   console.log(mamoun);
   mamoun.save();
 }
-// seedbookscollection();
+seedbookscollection();
 
 
 //
@@ -156,6 +156,33 @@ res.send(userData[0].books);
 
 })
 }
+
+server.put('/updatebooks/:BooksId',updateBooks);
+
+function updateBooks(req, res){
+
+  let {email ,bookName ,bookDescription ,bookImg ,bookstatus} =req.body;
+  newUserModel.find({email: email}, (error , userData) => {
+
+    if (error) {
+      res.send("cant update!!");
+    } else {      
+      userData.books.splice(index, 1, {
+        name: bookName,
+        description: bookDescription,
+        img: bookImg,
+        status: bookstatus,
+      });
+      userData.save();
+      res.send(userData.books);
+    }
+  });
+}
+
+
+
+
+
 // app.get('/test', (request, response) => {
 
   // TODO: 
