@@ -84,12 +84,12 @@ books:[{
 // seedbookscollection();
 
 
-
+//
 
 // http://localhost:3001/books?usermail=mamoun.alshishani@yahoo.com
 server.get('/books',getUserData);
-server.post('/addbooks',addBooksHandler);
-server.delete('/removebooks/:userBooks',removeBooksHandler);
+
+
 
 function getUserData(req, res){
 let {usermail} = req.query;
@@ -98,7 +98,7 @@ newUserModel.find({email:usermail},function(error,userData){
 
 if(error){
   res.send('no data ')
-}else{
+}else{0
 res.send(userData[0].books)}
 console.log(userData[0].books);
 })
@@ -107,22 +107,22 @@ console.log(userData[0].books);
 
 
 
-
+server.post('/books',addBooksHandler);
 function addBooksHandler(req, res){
 console.log(req.body);
 
-let {email ,name ,description ,Img ,stats} =req.body;
+let {email ,bookName ,bookDescription ,bookImg ,bookstatus} =req.body;
 
-newUserModel.find({email:email},(error,userData)=>{
+newUserModel.find({email:email},function(error,userData){
 
   if(error){
     res.send('cant find any informartion to post')
   }else{
   userData[0].books.push({
-name: name,
-Img: Img,
-description: description,
-stats: stats,
+name: bookName,
+Img: bookImg,
+description: bookDescription,
+status: bookstatus,
 
   })
   userData[0].save();
@@ -132,20 +132,20 @@ stats: stats,
 });
 }
 
-
+server.delete('/removebooks/:BooksId',removeBooksHandler);
 function removeBooksHandler(req, res){
 
-  let {usermail} = req.query;
-let  index=parseInt(req.params.userBooks);
+  let {email} = req.query;
+let index =Number(req.params.BooksId);
 
-newUserModel.find({email:usermail},(error,userData)=>{
+newUserModel.find({email: email}, (error , userData) => {
 
   if(error){
     res.send('could not delete ')
   }else{
-let deletedData=userData[0].books.filter((TheBooks, indx)=>{
+let deletedData=userData[0].books.filter((el, indx)=>{
 
-if  (indx !== index){return TheBooks}
+if  (indx !== index){return el}
 
 })
 userData[0].books =deletedData;
