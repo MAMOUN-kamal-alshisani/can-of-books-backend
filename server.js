@@ -14,7 +14,7 @@ server.use(express.json());
 
 const PORT = process.env.PORT;
 
-mongoose.connect('mongodb://localhost:27017/books', {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect('mongodb://mamoun:00000000@cluster0-shard-00-00.glcx2.mongodb.net:27017,cluster0-shard-00-01.glcx2.mongodb.net:27017,cluster0-shard-00-02.glcx2.mongodb.net:27017/booksproject?ssl=true&replicaSet=atlas-26qjx9-shard-0&authSource=admin&retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true});
 // const jwt = require('jsonwebtoken');
 // const jwksClient = require('jwks-rsa');
 
@@ -81,15 +81,15 @@ books:[{
   console.log(mamoun);
   mamoun.save();
 }
-// seedbookscollection();
+seedbookscollection();
 
 
-
+//
 
 // http://localhost:3001/books?usermail=mamoun.alshishani@yahoo.com
 server.get('/books',getUserData);
-server.post('/addbooks',addBooksHandler);
-server.delete('/removebooks/:userBooks',removeBooksHandler);
+
+
 
 function getUserData(req, res){
 let {usermail} = req.query;
@@ -98,7 +98,7 @@ newUserModel.find({email:usermail},function(error,userData){
 
 if(error){
   res.send('no data ')
-}else{
+}else{0
 res.send(userData[0].books)}
 console.log(userData[0].books);
 })
@@ -107,22 +107,22 @@ console.log(userData[0].books);
 
 
 
-
+server.post('/books',addBooksHandler);
 function addBooksHandler(req, res){
 console.log(req.body);
 
-let {email ,name ,description ,Img ,stats} =req.body;
+let {email ,bookName ,bookDescription ,bookImg ,bookstatus} =req.body;
 
-newUserModel.find({email:email},(error,userData)=>{
+newUserModel.find({email:email},function(error,userData){
 
   if(error){
     res.send('cant find any informartion to post')
   }else{
   userData[0].books.push({
-name: name,
-Img: Img,
-description: description,
-stats: stats,
+name: bookName,
+Img: bookImg,
+description: bookDescription,
+status: bookstatus,
 
   })
   userData[0].save();
@@ -132,20 +132,20 @@ stats: stats,
 });
 }
 
-
+server.delete('/removebooks/:BooksId',removeBooksHandler);
 function removeBooksHandler(req, res){
 
-  let {usermail} = req.query;
-let  index=parseInt(req.params.userBooks);
+  let {email} = req.query;
+let index =Number(req.params.BooksId);
 
-newUserModel.find({email:usermail},(error,userData)=>{
+newUserModel.find({email: email}, (error , userData) => {
 
   if(error){
     res.send('could not delete ')
   }else{
-let deletedData=userData[0].books.filter((TheBooks, indx)=>{
+let deletedData=userData[0].books.filter((el, indx)=>{
 
-if  (indx !== index){return TheBooks}
+if  (indx !== index){return el}
 
 })
 userData[0].books =deletedData;
@@ -156,6 +156,33 @@ res.send(userData[0].books);
 
 })
 }
+
+server.put('/updatebooks/:BooksId',updateBooks);
+
+function updateBooks(req, res){
+
+  let {email ,bookName ,bookDescription ,bookImg ,bookstatus} =req.body;
+  newUserModel.find({email: email}, (error , userData) => {
+
+    if (error) {
+      res.send("cant update!!");
+    } else {      
+      userData.books.splice(index, 1, {
+        name: bookName,
+        description: bookDescription,
+        img: bookImg,
+        status: bookstatus,
+      });
+      userData.save();
+      res.send(userData.books);
+    }
+  });
+}
+
+
+
+
+
 // app.get('/test', (request, response) => {
 
   // TODO: 
