@@ -156,6 +156,33 @@ res.send(userData[0].books);
 
 })
 }
+
+server.put('/updatebooks/:BooksId',updateBooks);
+
+function updateBooks(req, res){
+
+  let {email ,bookName ,bookDescription ,bookImg ,bookstatus} =req.body;
+  newUserModel.find({email: email}, (error , userData) => {
+
+    if (error) {
+      res.send("cant update!!");
+    } else {      
+      userData.books.splice(index, 1, {
+        name: bookName,
+        description: bookDescription,
+        img: bookImg,
+        status: bookstatus,
+      });
+      userData.save();
+      res.send(userData.books);
+    }
+  });
+}
+
+
+
+
+
 // app.get('/test', (request, response) => {
 
   // TODO: 
